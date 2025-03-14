@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",        // Setzt das JavaScript-Ziel auf ESNext
+    "module": "ESNext",        // Setzt das Modulziel auf ESNext
+    "strict": true,            // Aktiviert alle strikten Typüberprüfungen
+    "esModuleInterop": true,   // Ermöglicht den Import von CommonJS-Modulen
+    "skipLibCheck": true,      // Überspringt die Überprüfung von .d.ts-Dateien
+    "forceConsistentCasingInFileNames": true, // Erzwingt konsistente Groß-/Kleinschreibung bei Dateinamen
+//    "outDir": "./dist",        // Gibt das Ausgabeverzeichnis für die kompilierten Dateien an
+    "rootDir": "./src",        // Gibt das Verzeichnis der Eingabedateien an
+    "moduleResolution": "node" // Verwendet die Node.js-Modulauflösung
+  },
+  "include": [
+    "src/**/*"                 // Bezieht alle Dateien im src-Verzeichnis ein
+  ],
+  "exclude": [
+    "node_modules",            // Schließt das node_modules-Verzeichnis aus
+    "**/*.spec.ts"             // Schließt Testdateien aus
+  ]
+}
