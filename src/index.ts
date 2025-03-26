@@ -1,2 +1,3 @@
+import EnergyFlow from './EnergyFlow/Application/View/EnergyFlow';
 
-export default {};
+customElements.define('energy-flow', EnergyFlow);

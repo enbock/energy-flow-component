@@ -46,17 +46,9 @@ const config: Configuration & { devServer: any } = {
         ]
     },
     optimization: {
-        minimize: false
+        minimize: true
     },
-    plugins: [
-        new CopyPlugin({
-            patterns: [
-                {
-                    from: 'public'
-                }
-            ]
-        })
-    ],
+    plugins: [],
     resolve: {
         fallback: {
             'typescript': false,
@@ -74,6 +66,25 @@ const config: Configuration & { devServer: any } = {
 module.exports = (_: any, argv: any): Configuration => {
     if (argv.mode === 'development') {
         config.devtool = 'inline-source-map';
+        config.plugins!.push(
+            new CopyPlugin({
+                patterns: [
+                    {
+                        from: 'public'
+                    }
+                ]
+            })
+        );
+    } else {
+        config.plugins!.push(
+            new CopyPlugin({
+                patterns: [
+                    {
+                        from: 'package.json'
+                    }
+                ]
+            })
+        );
     }
     return config;
 };
