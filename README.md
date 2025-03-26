@@ -1,5 +1,9 @@
 # Energy flow web component
 
+<center>
+    <img src="./doc/images/efc_logo.png" alt="EFC Logo" width="300"/>
+</center>
+
 This component simulates the flow of energy (or water? or air? or particles?)
 
 The idea is so visualize how much energy goes from and to the energy connections inside my home power grid in a style of
@@ -9,3 +13,5 @@ a "medium" instead visualize cables or arrows.
 Of course, I don't have fun to write down all the code. So the first POC I let create by OpenAI GPT o1 ;)
 
 [See more here](AI-First-Draft.md)
+
+## Usage of component

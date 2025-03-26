@@ -1,20 +1,48 @@
 {
   "compilerOptions": {
-    "target": "ESNext",        // Setzt das JavaScript-Ziel auf ESNext
-    "module": "ESNext",        // Setzt das Modulziel auf ESNext
-    "strict": true,            // Aktiviert alle strikten Typüberprüfungen
-    "esModuleInterop": true,   // Ermöglicht den Import von CommonJS-Modulen
-    "skipLibCheck": true,      // Überspringt die Überprüfung von .d.ts-Dateien
-    "forceConsistentCasingInFileNames": true, // Erzwingt konsistente Groß-/Kleinschreibung bei Dateinamen
-//    "outDir": "./dist",        // Gibt das Ausgabeverzeichnis für die kompilierten Dateien an
-    "rootDir": "./src",        // Gibt das Verzeichnis der Eingabedateien an
-    "moduleResolution": "node" // Verwendet die Node.js-Modulauflösung
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "CommonJS",
+    "target": "ESNext",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": false,
+    "outDir": "./build/",
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "sourceRoot": "src",
+    "sourceMap": true,
+    "lib": [
+      "dom",
+      "DOM.Iterable",
+      "ESNext"
+    ],
+    "types": [
+      "node",
+      "jasmine"
+    ],
+    "typeRoots": [
+      "node_modules/@types",
+      "./src",
+      "./jasmine"
+    ]
   },
   "include": [
-    "src/**/*"                 // Bezieht alle Dateien im src-Verzeichnis ein
+    "src",
+    "jasmine",
+    "webpack.config.ts"
   ],
   "exclude": [
-    "node_modules",            // Schließt das node_modules-Verzeichnis aus
-    "**/*.spec.ts"             // Schließt Testdateien aus
-  ]
+    "node_modules"
+  ],
+  "ts-node": {
+    "require": [
+      "tsconfig-paths/register"
+    ]
+  }
 }
