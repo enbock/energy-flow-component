@@ -26,18 +26,43 @@
             position: absolute;
             width: 8rem;
             height: 8rem;
+            z-index: 1;
+        }
 
-            transform: translate(-50%, -50%);
-            background-size: cover;
+        energy-flow:nth-child(2) {
+            energy-connection {
+                transform: translate(-50%, -50%);
+                background-size: cover;
 
-            &:nth-child(1) {
-                background-image: url(images/power_mast.png);
-                background-color: rgba(0, 0, 255, 0.25);
-            }
+                &:nth-child(1) {
+                    background-image: url(images/solar_panel.png);
+                }
 
-            &:nth-child(2) {
-                background-image: url(images/house.png);
-                background-color: rgba(255, 0, 0, 0.25);
+                &:nth-child(2) {
+                    background-image: url(images/power_mast.png);
+                    transform: translate(-50%, -86%);
+                }
+
+                &:nth-child(3) {
+                    background-image: url(images/battery.png);
+
+                    charge {
+                        position: absolute;
+                        top: 50%;
+                        right: -30%;
+                    }
+                }
+
+                &:nth-child(4) {
+                    background-image: url(images/house.png);
+                }
+
+                watt {
+                    display: block;
+                    text-align: center;
+                    font-weight: bold;
+                    padding-top: 95%;
+                }
             }
         }
     </style>
@@ -47,12 +72,91 @@
 <body>
 
 Energy Flow Playground
-<energy-flow>
-    <energy-connection color="rgba(0, 0, 255, 0.5)" value="1000" x="0" y="-.8">
+<energy-flow id="background">
+    <energy-connection color="rgba(255, 0, 0, 0.05)" value="-12000" x="0" y="-.7"></energy-connection>
+    <energy-connection color="rgba(0, 0, 0, 0.05)" value="-1000" x="-.8" y="0"></energy-connection>
+    <energy-connection color="rgba(0, 0, 0, 0.05)" value="-1000" x=".8" y="0"></energy-connection>
+    <energy-connection color="rgba(0, 0, 0, 0.05)" value="13000" x="0" y=".8"></energy-connection>
+</energy-flow>
+<energy-flow id="foreground">
+    <energy-connection color="rgba(0, 200, 100, 0.5)" value="12000" x="0" y="-.7">
+        <watt>12000 W</watt>
     </energy-connection>
-    <energy-connection color="rgba(255, 0, 0, 0.5)" value="-1000" x=".2" y=".8">
+    <energy-connection color="rgba(130, 0, 0, 0.5)" value="1000" x="-.8" y="0">
+        <watt>1000 W</watt>
+    </energy-connection>
+    <energy-connection color="rgba(220, 220, 0, 0.5)" value="1000" x=".8" y="0">
+        <watt>1000 W</watt>
+    </energy-connection>
+    <energy-connection color="rgba(0, 0, 0, 1)" value="-13000" x="0" y=".8">
+        <watt>1000 W</watt>
     </energy-connection>
 </energy-flow>
+|| <label><input id="solar-off" type="checkbox">Solar off</label>
+
+<script>
+    async function main() {
+        const background = document.getElementById('background');
+        const foreground = document.getElementById('foreground');
+        const checkbox = document.getElementById('solar-off');
+
+        let solar = Math.round(Math.random() * 15000);
+        let house = Math.round((Math.random() * 30000) - 15000);
+        let battery = 0;
+        let power = 0;
+        let charge = 500;
+
+        const change = 600;
+
+        while (true) {
+
+            solar += Math.round(Math.random() * change * 2 - change);
+            if (solar < 0) solar = 0;
+            if (checkbox.checked) solar = 0;
+            house += Math.round(Math.random() * change - change / 2);
+            if (house < 100) house = 100;
+            if (house < 0) house = 0;
+            battery = house - solar;
+            if (battery < -3600) battery = -3600;
+            if (battery > 3600) battery = 3600;
+
+            charge += Math.round(1 / (60 / 0.2) * (battery * -1));
+
+            if (charge > 500) {
+                charge = 500;
+                battery = 0;
+            }
+            if (charge <= 0) {
+                charge = 0;
+                battery = 0;
+            }
+
+            power = Math.round(solar + battery - house);
+
+            const fc = foreground.querySelectorAll('energy-connection');
+            const bc = background.querySelectorAll('energy-connection');
+            fc.item(0).setAttribute('value', solar);
+            fc.item(0).innerHTML = `<watt>${solar} W</watt>`;
+            bc.item(0).setAttribute('value', solar * -1);
+
+            fc.item(1).setAttribute('value', power * -1);
+            fc.item(1).innerHTML = `<watt>${Math.abs(power * -1)} W</watt>`;
+            bc.item(1).setAttribute('value', power);
+
+            fc.item(2).setAttribute('value', battery);
+            fc.item(2).innerHTML = `<watt>${battery} W</watt><charge>${charge}Wh</charge>`;
+            bc.item(2).setAttribute('value', battery * -1);
+
+            fc.item(3).setAttribute('value', house * -1);
+            fc.item(3).innerHTML = `<watt>${house} W</watt>`;
+            bc.item(3).setAttribute('value', house);
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+        }
+    }
+
+    requestAnimationFrame(main);
+</script>
 
 </body>
 </html>

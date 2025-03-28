@@ -81,8 +81,7 @@ export default class EnergyFlow extends HTMLElement {
         context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         context.save();
         let lastColorIndex: number = -1;
-        const radius: number = Math.sqrt(
-            this.config.canvasWidth * this.config.canvasHeight) * (this.config.particleSize / 150);
+        const radius: number = Math.sqrt(this.config.canvasWidth * this.config.canvasHeight) * this.config.particleSize;
 
         for (const particle of this.model.particles) {
             if (particle.connectionIndex != lastColorIndex) {

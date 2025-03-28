@@ -3,6 +3,8 @@ import ParticleCleaner from './Tasks/ParticleCleaner';
 import ParticleAnimator from './Tasks/ParticleAnimator';
 import StateStorage from '../StateStorage';
 import ParticleEntity from '../ParticleEntity';
+import GetParticlesResponse from './GetParticlesResponse';
+import ConnectionEntity from '../ConnectionUseCase/ConnectionEntity';
 
 export default class ParticleUseCase {
     constructor(
@@ -13,13 +15,18 @@ export default class ParticleUseCase {
     ) {
     }
 
+    public getParticles(response: GetParticlesResponse): void {
+        response.particles = this.stateStorage.getParticles();
+    }
+
     public tick(): void {
         const particles: Array<ParticleEntity> = this.stateStorage.getParticles();
-        this.particleCreator.createParticles(particles);
-        this.particleAnimator.updateParticles(this.stateStorage.getConnections(), particles);
+        const connections: Array<ConnectionEntity> = this.stateStorage.getConnections();
+        this.particleCreator.createParticles(connections, particles);
+        this.particleAnimator.updateParticles(connections, particles);
 
         this.stateStorage.setParticles(
-            this.particleCleaner.cleanParticles(particles)
+            this.particleCleaner.cleanParticles(connections, particles)
         );
     }
 }

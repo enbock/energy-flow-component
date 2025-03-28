@@ -1,5 +1,6 @@
 import StateStorage from '../StateStorage';
 import UpdateConnectionsRequest from './UpdateConnectionsRequest';
+import GetConnectionResponse from './GetConnectionResponse';
 
 export default class ConnectionUseCase {
     constructor(
@@ -9,5 +10,9 @@ export default class ConnectionUseCase {
 
     public updateConnections(request: UpdateConnectionsRequest): void {
         this.stateStorage.setConnections(request.connections);
+    }
+
+    public getConnections(response: GetConnectionResponse): void {
+        response.connections = this.stateStorage.getConnections();
     }
 }

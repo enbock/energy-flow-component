@@ -1,5 +1,5 @@
-export type PresentDataCallback = Callback<() => Promise<void>>;
+export type PresentDataCallback = Callback;
 
 export default interface ControllerHandler {
-    initialize(presentData?: PresentDataCallback): Promise<void>;
+    initialize(presentData?: PresentDataCallback): void;
 }
