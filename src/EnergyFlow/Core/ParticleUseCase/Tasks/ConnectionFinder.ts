@@ -23,6 +23,6 @@ export default class ConnectionFinder {
             }
             random -= amount;
         }
-        return filtered[filtered.length - 1].idx;
+        return filtered[0]?.idx;
     }
 }

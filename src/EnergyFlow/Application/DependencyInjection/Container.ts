@@ -35,7 +35,8 @@ export default class Container {
             new ParticleAnimator(
                 this.config
             ),
-            stateStorage
+            stateStorage,
+            connectionFinder
         );
         this.controller = new Controller(
             mainView,

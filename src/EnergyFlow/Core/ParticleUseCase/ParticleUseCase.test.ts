@@ -25,7 +25,8 @@ describe('ParticleUseCase', function (): void {
             particleCreator,
             particleCleaner,
             particleAnimator,
-            stateStorage
+            stateStorage,
+            mock()
         );
     });
 

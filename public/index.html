@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!--suppress HtmlUnknownTarget -->
     <link href="images/efc_logo.png" rel="icon">
     <title>Energy Flow Playground</title>
     <style>
@@ -73,22 +74,22 @@
 
 Energy Flow Playground
 <energy-flow id="background">
-    <energy-connection color="rgba(255, 0, 0, 0.05)" value="-12000" x="0" y="-.7"></energy-connection>
-    <energy-connection color="rgba(0, 0, 0, 0.05)" value="-1000" x="-.8" y="0"></energy-connection>
-    <energy-connection color="rgba(0, 0, 0, 0.05)" value="-1000" x=".8" y="0"></energy-connection>
-    <energy-connection color="rgba(0, 0, 0, 0.05)" value="13000" x="0" y=".8"></energy-connection>
+    <energy-connection color="rgba(0, 200, 100, 0.1)" value="0" x="0" y="-.7"></energy-connection>
+    <energy-connection color="rgba(130, 0, 0, 0.1)" value="0" x="-.8" y="0"></energy-connection>
+    <energy-connection color="rgba(220, 220, 0, 0.1)" value="0" x=".8" y="0"></energy-connection>
+    <energy-connection color="rgba(0, 0, 180, 0.1)" value="0" x="0" y=".8"></energy-connection>
 </energy-flow>
 <energy-flow id="foreground">
-    <energy-connection color="rgba(0, 200, 100, 0.5)" value="12000" x="0" y="-.7">
+    <energy-connection color="rgba(0, 200, 100, 0.75)" value="0" x="0" y="-.7">
         <watt>12000 W</watt>
     </energy-connection>
-    <energy-connection color="rgba(130, 0, 0, 0.5)" value="1000" x="-.8" y="0">
+    <energy-connection color="rgba(130, 0, 0, 0.75)" value="0" x="-.8" y="0">
         <watt>1000 W</watt>
     </energy-connection>
-    <energy-connection color="rgba(220, 220, 0, 0.5)" value="1000" x=".8" y="0">
+    <energy-connection color="rgba(220, 220, 0, 0.75)" value="0" x=".8" y="0">
         <watt>1000 W</watt>
     </energy-connection>
-    <energy-connection color="rgba(0, 0, 0, 1)" value="-13000" x="0" y=".8">
+    <energy-connection color="rgba(0, 0, 180, 0.75)" value="0" x="0" y=".8">
         <watt>1000 W</watt>
     </energy-connection>
 </energy-flow>
@@ -108,8 +109,8 @@ Energy Flow Playground
 
         const change = 600;
 
+        // noinspection InfiniteLoopJS
         while (true) {
-
             solar += Math.round(Math.random() * change * 2 - change);
             if (solar < 0) solar = 0;
             if (checkbox.checked) solar = 0;

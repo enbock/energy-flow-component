@@ -9,15 +9,14 @@ export default class EnergyFlowPresenter {
 
         model.particles = data.particleResponse.particles.map(p => this.presentParticle(p));
         model.colors = data.connectionResponse.connections.map(c => c.color);
-        //console.log('>>>', model);
+
         return model;
     }
 
     private presentParticle(particle: ParticleEntity): ParticleModel {
         const model: ParticleModel = new ParticleModel();
 
-        model.connectionIndex = particle.source ?? 0
-        ;
+        model.connectionIndex = particle.source ?? 0;
         model.x = particle.position.x;
         model.y = particle.position.y;
 

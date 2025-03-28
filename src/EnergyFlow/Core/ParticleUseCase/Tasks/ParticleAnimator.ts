@@ -32,14 +32,15 @@ export default class ParticleAnimator {
         speed: number,
         jitterAmplitude: number
     ): void {
+        if (particle.target === undefined) return;
+        if (particle.source === undefined) return;
+
         const px = particle.position.x;
         const py = particle.position.y;
 
         // Vektor vom Partikel zur Mitte
         let dxCenter = 0 - px;
         let dyCenter = 0 - py;
-
-        if (particle.target === undefined) return;
 
         let ax: number = dxCenter;
         let ay: number = dyCenter;
@@ -49,12 +50,18 @@ export default class ParticleAnimator {
             ay /= aMag;
         }
 
-        const targetConnection = connections[particle.target];
+        const targetConnection: ConnectionEntity | undefined = connections[particle.target];
+
+        if (targetConnection === undefined) {
+            particle.target = undefined;
+            return;
+        }
+
         const dx: number = targetConnection.x - particle.position.x;
         const dy: number = targetConnection.y - particle.position.y;
         const dist: number = Math.sqrt(dx * dx + dy * dy);
 
-        if (particle.source !== undefined && particle.progress < 1) {
+        if (particle.progress < 1) {
             this.updateParticleProgress(particle, connections);
         }
 
