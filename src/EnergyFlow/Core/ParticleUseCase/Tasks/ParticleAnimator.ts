@@ -20,7 +20,7 @@ export default class ParticleAnimator {
     }
 
     private calculateSpeed(particleSpeed: number): number {
-        return (particleSpeed / 3500) * Math.sqrt(2 * 2);
+        return (particleSpeed / 350) * Math.sqrt(2 * 2);
     }
 
     private advanceParticle(particle: ParticleEntity, speed: number): void {

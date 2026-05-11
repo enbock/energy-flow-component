@@ -14,59 +14,28 @@ export default class ParticleCreator {
     }
 
     public createParticles(connections: Array<ConnectionEntity>, particles: Array<ParticleEntity>): void {
-        if (particles.length >= this.config.particleCount) return;
+        while (particles.length < this.config.particleCount) {
+            const sourceIndex: number | undefined = this.connectionFinder.chooseConnectionIndex(connections, true);
+            if (sourceIndex === undefined) return;
 
-        const sources: Array<ConnectionEntity> = connections.filter(function (c: ConnectionEntity): boolean {
-            return c.value > 0;
-        });
-
-        for (const source of sources) {
-            if (particles.length == 0) {
-                this.createParticleBatch(particles, connections, source);
-                continue;
-            }
-            let found: boolean = false;
-            for (const particle of particles) {
-                const isInSourceZone: boolean =
-                    Math.hypot(source.x - particle.position.x, source.y - particle.position.y)
-                    < this.config.particleSize;
-
-                if (isInSourceZone) {
-                    found = true;
-                    break;
-                }
-            }
-            if (found === false) {
-                this.createParticleBatch(particles, connections, source);
-            }
-        }
-    }
-
-    private createParticleBatch(
-        particles: Array<ParticleEntity>,
-        connections: Array<ConnectionEntity>,
-        source: ConnectionEntity
-    ): void {
-        for (let i = 0; i < this.config.particleCreateBatchSize; i++) {
             const newParticle: ParticleEntity = new ParticleEntity();
             particles.push(newParticle);
-
-            this.resetParticle(newParticle, connections, source);
+            this.resetParticle(newParticle, connections, connections[sourceIndex], sourceIndex);
         }
     }
 
     private resetParticle(
         particle: ParticleEntity,
         connections: Array<ConnectionEntity>,
-        sourceConnection: ConnectionEntity
+        sourceConnection: ConnectionEntity,
+        sourceIndex: number
     ): void {
         particle.position = {x: sourceConnection.x, y: sourceConnection.y};
-
-        const source: number = connections.indexOf(sourceConnection);
-        particle.source = source > -1 ? source : undefined;
+        particle.source = sourceIndex;
         particle.target = this.connectionFinder.chooseConnectionIndex(connections, false);
 
-        if (particle.target === undefined || particle.source === undefined) {
+        if (particle.target === undefined) {
+            particle.source = undefined;
             particle.trajectory = [];
             particle.trajectoryLength = 0;
             particle.trajectoryProgress = 0;

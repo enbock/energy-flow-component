@@ -16,8 +16,7 @@ describe('EnergyFlow.Core.ParticleUseCase.Tasks.ParticleCreator', function (): v
 
     beforeEach(function (): void {
         config = new Config();
-        config.particleCount = 10;
-        config.particleCreateBatchSize = 1;
+        config.particleCount = 1;
         connectionFinder = mock<ConnectionFinder>();
         trajectoryCalculator = mock<TrajectoryCalculator>();
         particleCreator = new ParticleCreator(config, connectionFinder, trajectoryCalculator);
@@ -39,7 +38,10 @@ describe('EnergyFlow.Core.ParticleUseCase.Tasks.ParticleCreator', function (): v
             {x: 0, y: 0},
             {x: 1, y: 0}
         ];
-        connectionFinder.chooseConnectionIndex.and.returnValue(1);
+        let chooseCall: number = 0;
+        connectionFinder.chooseConnectionIndex.and.callFake(function (): number {
+            return chooseCall++ === 0 ? 0 : 1;
+        });
         trajectoryCalculator.calculateTrajectory.and.returnValue(trajectory);
         trajectoryCalculator.calculateLength.and.returnValue(2);
 
@@ -71,7 +73,10 @@ describe('EnergyFlow.Core.ParticleUseCase.Tasks.ParticleCreator', function (): v
             {x: -1, y: 0},
             {x: 1, y: 0}
         ];
-        connectionFinder.chooseConnectionIndex.and.returnValue(1);
+        let chooseCall: number = 0;
+        connectionFinder.chooseConnectionIndex.and.callFake(function (): number {
+            return chooseCall++ === 0 ? 0 : 1;
+        });
         trajectoryCalculator.calculateTrajectory.and.returnValue(trajectory);
         trajectoryCalculator.calculateLength.and.returnValue(2);
         const backupRandom: () => number = Math.random;
@@ -86,5 +91,41 @@ describe('EnergyFlow.Core.ParticleUseCase.Tasks.ParticleCreator', function (): v
         } finally {
             Math.random = backupRandom;
         }
+    });
+
+    it('should immediately fill particles up to the configured maximum on first call', function (): void {
+        config.particleCount = 5;
+        const source: ConnectionEntity = new ConnectionEntity();
+        source.value = 5;
+        source.x = -1;
+        source.y = 0;
+        const target: ConnectionEntity = new ConnectionEntity();
+        target.value = -5;
+        target.x = 1;
+        target.y = 0;
+        const connections: Array<ConnectionEntity> = [source, target];
+        const particles: Array<ParticleEntity> = [];
+        const trajectory: Array<{x: number, y: number}> = [{x: -1, y: 0}, {x: 1, y: 0}];
+        let chooseCall: number = 0;
+        connectionFinder.chooseConnectionIndex.and.callFake(function (): number {
+            return chooseCall++ % 2 === 0 ? 0 : 1;
+        });
+        trajectoryCalculator.calculateTrajectory.and.returnValue(trajectory);
+        trajectoryCalculator.calculateLength.and.returnValue(2);
+
+        particleCreator.createParticles(connections, particles);
+
+        assert.strictEqual(particles.length, 5);
+    });
+
+    it('should not create particles when no positive source is available', function (): void {
+        config.particleCount = 5;
+        const connections: Array<ConnectionEntity> = [];
+        const particles: Array<ParticleEntity> = [];
+        connectionFinder.chooseConnectionIndex.and.returnValue(undefined);
+
+        particleCreator.createParticles(connections, particles);
+
+        assert.strictEqual(particles.length, 0);
     });
 });
