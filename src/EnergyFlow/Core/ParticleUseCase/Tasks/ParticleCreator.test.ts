@@ -50,11 +50,41 @@ describe('EnergyFlow.Core.ParticleUseCase.Tasks.ParticleCreator', function (): v
         assert.strictEqual(particles[0].target, 1);
         assert.strictEqual(particles[0].trajectory, trajectory);
         assert.strictEqual(particles[0].trajectoryLength, 2);
-        assert.strictEqual(particles[0].trajectoryProgress, 0);
-        assert.deepStrictEqual(particles[0].position, {x: -1, y: 0});
+        assert.ok(particles[0].trajectoryProgress >= 0 && particles[0].trajectoryProgress < 1);
         assert.deepStrictEqual(
             trajectoryCalculator.calculateTrajectory.mock.calls[0].arguments,
             [{x: -1, y: 0}, {x: 1, y: 0}]
         );
+    });
+
+    it('should distribute the initial position along the trajectory based on the random progress', function (): void {
+        const source: ConnectionEntity = new ConnectionEntity();
+        source.value = 5;
+        source.x = -1;
+        source.y = 0;
+        const target: ConnectionEntity = new ConnectionEntity();
+        target.value = -5;
+        target.x = 1;
+        target.y = 0;
+        const connections: Array<ConnectionEntity> = [source, target];
+        const trajectory: Array<{x: number, y: number}> = [
+            {x: -1, y: 0},
+            {x: 1, y: 0}
+        ];
+        connectionFinder.chooseConnectionIndex.and.returnValue(1);
+        trajectoryCalculator.calculateTrajectory.and.returnValue(trajectory);
+        trajectoryCalculator.calculateLength.and.returnValue(2);
+        const backupRandom: () => number = Math.random;
+        Math.random = function (): number { return 0.5; };
+
+        try {
+            const particles: Array<ParticleEntity> = [];
+            particleCreator.createParticles(connections, particles);
+
+            assert.strictEqual(particles[0].trajectoryProgress, 0.5);
+            assert.deepStrictEqual(particles[0].position, {x: 0, y: 0});
+        } finally {
+            Math.random = backupRandom;
+        }
     });
 });
