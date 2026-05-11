@@ -9,7 +9,6 @@ import StateStorage from '../StateStorage';
 import GetParticlesResponse from './GetParticlesResponse';
 import ParticleEntity from '../ParticleEntity';
 import ConnectionEntity from '../ConnectionUseCase/ConnectionEntity';
-import ConnectionFinder from './Tasks/ConnectionFinder';
 
 describe('EnergyFlow.Core.ParticleUseCase.ParticleUseCase', function (): void {
     let particleUseCase: ParticleUseCase;
@@ -17,21 +16,18 @@ describe('EnergyFlow.Core.ParticleUseCase.ParticleUseCase', function (): void {
     let particleCleaner: Mocked<ParticleCleaner>;
     let particleAnimator: Mocked<ParticleAnimator>;
     let stateStorage: Mocked<StateStorage>;
-    let connectionFinder: Mocked<ConnectionFinder>;
 
     beforeEach(function (): void {
         particleCreator = mock<ParticleCreator>();
         particleCleaner = mock<ParticleCleaner>();
         particleAnimator = mock<ParticleAnimator>();
         stateStorage = mock<StateStorage>();
-        connectionFinder = mock<ConnectionFinder>();
 
         particleUseCase = new ParticleUseCase(
             particleCreator,
             particleCleaner,
             particleAnimator,
-            stateStorage,
-            connectionFinder
+            stateStorage
         );
     });
 
@@ -48,8 +44,15 @@ describe('EnergyFlow.Core.ParticleUseCase.ParticleUseCase', function (): void {
     });
 
     it('should tick and update particles', function (): void {
-        const particles: Array<ParticleEntity> = [<MockedObject>'test::particle'];
-        const connections: Array<ConnectionEntity> = [<MockedObject>'test::connection'];
+        const particle: ParticleEntity = new ParticleEntity();
+        particle.source = 0;
+        particle.target = 1;
+        const source: ConnectionEntity = new ConnectionEntity();
+        source.value = 10;
+        const target: ConnectionEntity = new ConnectionEntity();
+        target.value = -10;
+        const particles: Array<ParticleEntity> = [particle];
+        const connections: Array<ConnectionEntity> = [source, target];
 
         stateStorage.getParticles.and.returnValue(particles);
         stateStorage.getConnections.and.returnValue(connections);
@@ -61,5 +64,26 @@ describe('EnergyFlow.Core.ParticleUseCase.ParticleUseCase', function (): void {
         assert.deepStrictEqual(particleCreator.createParticles.mock.calls[0].arguments, [connections, particles]);
         assert.deepStrictEqual(particleAnimator.updateParticles.mock.calls[0].arguments, [connections, particles]);
         assert.deepStrictEqual(stateStorage.setParticles.mock.calls[0].arguments, [particles]);
+    });
+
+    it('should invalidate particles whose source connection is no longer positive', function (): void {
+        const particle: ParticleEntity = new ParticleEntity();
+        particle.source = 0;
+        particle.target = 1;
+        const source: ConnectionEntity = new ConnectionEntity();
+        source.value = -5;
+        const target: ConnectionEntity = new ConnectionEntity();
+        target.value = -10;
+        const particles: Array<ParticleEntity> = [particle];
+        const connections: Array<ConnectionEntity> = [source, target];
+
+        stateStorage.getParticles.and.returnValue(particles);
+        stateStorage.getConnections.and.returnValue(connections);
+        particleCleaner.cleanParticles.and.returnValue([]);
+
+        particleUseCase.tick();
+
+        assert.strictEqual(particle.source, undefined);
+        assert.strictEqual(particle.target, undefined);
     });
 });

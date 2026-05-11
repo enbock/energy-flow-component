@@ -5,9 +5,9 @@ export interface Coordinate {
 
 export default class ParticleEntity {
     public position: Coordinate = {x: 0, y: 0};
-    public velocity: Coordinate = {x: 0, y: 0};
     public source?: number;
     public target?: number;
-    public progress: number = 0;
-    public progressBefore: number = 0;
+    public trajectory: Array<Coordinate> = [];
+    public trajectoryLength: number = 0;
+    public trajectoryProgress: number = 0;
 }

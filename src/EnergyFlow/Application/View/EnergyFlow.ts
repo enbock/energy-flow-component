@@ -6,6 +6,10 @@ import ConnectionEntity from '../../Core/ConnectionUseCase/ConnectionEntity';
 import Config from '../../Core/Config';
 
 export default class EnergyFlow extends HTMLElement {
+    public static get observedAttributes(): Array<string> {
+        return ['debug-trajectories'];
+    }
+
     public config: Config = new Config();
     private model: EnergyFlowModel = new EnergyFlowModel();
     private readonly resizeCallback: Callback;
@@ -40,10 +44,21 @@ export default class EnergyFlow extends HTMLElement {
         clearInterval(this.parseTimer);
     }
 
+    // noinspection JSUnusedGlobalSymbols
+    public attributeChangedCallback(name: string): void {
+        if (name === 'debug-trajectories') {
+            requestAnimationFrame(() => this.renderView());
+        }
+    }
+
     public render(model: EnergyFlowModel): void {
         this.model = model;
         this.model.particles.sort((a, b) => a.connectionIndex - b.connectionIndex);
         requestAnimationFrame(() => this.renderView());
+    }
+
+    private isDebugTrajectoriesEnabled(): boolean {
+        return this.hasAttribute('debug-trajectories');
     }
 
     private updateComponent(): void {
@@ -79,6 +94,11 @@ export default class EnergyFlow extends HTMLElement {
         if (!context) return;
 
         context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        if (this.isDebugTrajectoriesEnabled()) {
+            this.renderTrajectories(context);
+        }
+
         context.save();
         let lastColorIndex: number = -1;
         const radius: number = Math.sqrt(this.config.canvasWidth * this.config.canvasHeight) * this.config.particleSize;
@@ -94,6 +114,30 @@ export default class EnergyFlow extends HTMLElement {
             this.renderParticle(particle, context, radius);
         }
 
+        context.restore();
+    }
+
+    private renderTrajectories(context: CanvasRenderingContext2D): void {
+        context.save();
+        context.lineWidth = 1;
+        for (const particle of this.model.particles) {
+            if (particle.trajectory.length < 2) continue;
+            context.strokeStyle = this.model.colors[particle.connectionIndex] ?? 'rgba(0,0,0,0.5)';
+            context.beginPath();
+            const first: {x: number, y: number} = this.calculatePosition(
+                particle.trajectory[0].x,
+                particle.trajectory[0].y
+            );
+            context.moveTo(first.x, first.y);
+            for (let i = 1; i < particle.trajectory.length; i++) {
+                const point: {x: number, y: number} = this.calculatePosition(
+                    particle.trajectory[i].x,
+                    particle.trajectory[i].y
+                );
+                context.lineTo(point.x, point.y);
+            }
+            context.stroke();
+        }
         context.restore();
     }
 

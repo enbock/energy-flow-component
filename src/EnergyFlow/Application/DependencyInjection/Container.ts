@@ -12,6 +12,7 @@ import ParticleCreator from '../../Core/ParticleUseCase/Tasks/ParticleCreator';
 import ParticleCleaner from '../../Core/ParticleUseCase/Tasks/ParticleCleaner';
 import ParticleAnimator from '../../Core/ParticleUseCase/Tasks/ParticleAnimator';
 import ConnectionFinder from '../../Core/ParticleUseCase/Tasks/ConnectionFinder';
+import TrajectoryCalculator from '../../Core/ParticleUseCase/Tasks/TrajectoryCalculator';
 import EnergyFlowPresenter from '../View/EnergyFlowPresenter';
 
 export default class Container {
@@ -26,17 +27,20 @@ export default class Container {
             stateStorage
         );
         const connectionFinder: ConnectionFinder = new ConnectionFinder();
+        const trajectoryCalculator: TrajectoryCalculator = new TrajectoryCalculator(
+            this.config
+        );
         const particleUseCase: ParticleUseCase = new ParticleUseCase(
             new ParticleCreator(
                 this.config,
-                connectionFinder
+                connectionFinder,
+                trajectoryCalculator
             ),
             new ParticleCleaner(),
             new ParticleAnimator(
                 this.config
             ),
-            stateStorage,
-            connectionFinder
+            stateStorage
         );
         this.controller = new Controller(
             mainView,

@@ -19,6 +19,7 @@ describe('EnergyFlow.Application.View.EnergyFlowPresenter', function (): void {
         const particle1: ParticleEntity = new ParticleEntity();
         particle1.source = 5;
         particle1.position = {x: 10, y: 20};
+        particle1.trajectory = [{x: 10, y: 20}, {x: 0, y: 0}];
 
         const particle2: ParticleEntity = new ParticleEntity();
         particle2.source = 3;
@@ -40,9 +41,11 @@ describe('EnergyFlow.Application.View.EnergyFlowPresenter', function (): void {
         assert.strictEqual(result.particles[0].connectionIndex, 5);
         assert.strictEqual(result.particles[0].x, 10);
         assert.strictEqual(result.particles[0].y, 20);
+        assert.deepStrictEqual(result.particles[0].trajectory, [{x: 10, y: 20}, {x: 0, y: 0}]);
         assert.strictEqual(result.particles[1].connectionIndex, 3);
         assert.strictEqual(result.particles[1].x, 30);
         assert.strictEqual(result.particles[1].y, 40);
+        assert.deepStrictEqual(result.particles[1].trajectory, []);
         assert.deepStrictEqual(result.colors, ['test::color1', 'test::color2']);
     });
 });
