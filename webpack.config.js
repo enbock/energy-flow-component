@@ -80,6 +80,12 @@ module.exports = (_, argv) => {
                 patterns: [
                     {
                         from: 'package.json'
+                    },
+                    {
+                        from: 'README.md'
+                    },
+                    {
+                        from: 'LICENSE'
                     }
                 ]
             })

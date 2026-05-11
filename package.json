@@ -1,8 +1,11 @@
 {
   "name": "@enbock/energy-flow-component",
-  "version": "0.0.0-dev1",
+  "version": "0.1.1",
   "description": "A visualisation of a energy flow.",
   "main": "index.js",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "start": "webpack serve --open --mode development --no-open --no-hot --stats-error-details",
     "build": "webpack --mode production",

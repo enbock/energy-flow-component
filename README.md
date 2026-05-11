@@ -13,7 +13,7 @@ a "medium" instead visualize cables or arrows.
 
 Of course, I don't have fun to write down all the code. So the first POC I let create by OpenAI GPT o1 ;)
 
-[See more here](https://github.com/enbock/energy-flow-component/blob/main/AI-First-Draft.md)
+Over the time I used Clause Sonnet and Opus via Copilot CLI to write test, update environment and code my ideas down.
 
 ## Usage of component
 
