@@ -6,6 +6,7 @@ import ParticleCreator from './Tasks/ParticleCreator';
 import ParticleCleaner from './Tasks/ParticleCleaner';
 import ParticleAnimator from './Tasks/ParticleAnimator';
 import ParticleRecycler from './Tasks/ParticleRecycler';
+import ParticleReassigner from './Tasks/ParticleReassigner';
 import ParticleRebalancer from './Tasks/ParticleRebalancer';
 import StateStorage from '../StateStorage';
 import GetParticlesResponse from './GetParticlesResponse';
@@ -18,6 +19,7 @@ describe('EnergyFlow.Core.ParticleUseCase.ParticleUseCase', function (): void {
     let particleCleaner: Mocked<ParticleCleaner>;
     let particleAnimator: Mocked<ParticleAnimator>;
     let particleRecycler: Mocked<ParticleRecycler>;
+    let particleReassigner: Mocked<ParticleReassigner>;
     let particleRebalancer: Mocked<ParticleRebalancer>;
     let stateStorage: Mocked<StateStorage>;
 
@@ -26,6 +28,7 @@ describe('EnergyFlow.Core.ParticleUseCase.ParticleUseCase', function (): void {
         particleCleaner = mock<ParticleCleaner>();
         particleAnimator = mock<ParticleAnimator>();
         particleRecycler = mock<ParticleRecycler>();
+        particleReassigner = mock<ParticleReassigner>();
         particleRebalancer = mock<ParticleRebalancer>();
         stateStorage = mock<StateStorage>();
 
@@ -34,6 +37,7 @@ describe('EnergyFlow.Core.ParticleUseCase.ParticleUseCase', function (): void {
             particleCleaner,
             particleAnimator,
             particleRecycler,
+            particleReassigner,
             particleRebalancer,
             stateStorage
         );
@@ -72,11 +76,12 @@ describe('EnergyFlow.Core.ParticleUseCase.ParticleUseCase', function (): void {
         assert.deepStrictEqual(particleCreator.createParticles.mock.calls[0].arguments, [connections, particles]);
         assert.deepStrictEqual(particleAnimator.updateParticles.mock.calls[0].arguments, [connections, particles]);
         assert.deepStrictEqual(particleRecycler.recycle.mock.calls[0].arguments, [connections, particles]);
+        assert.deepStrictEqual(particleReassigner.reassign.mock.calls[0].arguments, [connections, particles]);
         assert.deepStrictEqual(particleRebalancer.rebalance.mock.calls[0].arguments, [connections, particles]);
         assert.deepStrictEqual(stateStorage.setParticles.mock.calls[0].arguments, [particles]);
     });
 
-    it('should invalidate particles whose source connection is no longer positive', function (): void {
+    it('should not destroy particles directly when their source becomes invalid', function (): void {
         const particle: ParticleEntity = new ParticleEntity();
         particle.source = 0;
         particle.target = 1;
@@ -89,11 +94,12 @@ describe('EnergyFlow.Core.ParticleUseCase.ParticleUseCase', function (): void {
 
         stateStorage.getParticles.and.returnValue(particles);
         stateStorage.getConnections.and.returnValue(connections);
-        particleCleaner.cleanParticles.and.returnValue([]);
+        particleCleaner.cleanParticles.and.returnValue(particles);
 
         particleUseCase.tick();
 
-        assert.strictEqual(particle.source, undefined);
-        assert.strictEqual(particle.target, undefined);
+        assert.strictEqual(particle.source, 0);
+        assert.strictEqual(particle.target, 1);
+        assert.deepStrictEqual(particleReassigner.reassign.mock.calls[0].arguments, [connections, particles]);
     });
 });

@@ -2,6 +2,7 @@ import ParticleCreator from './Tasks/ParticleCreator';
 import ParticleCleaner from './Tasks/ParticleCleaner';
 import ParticleAnimator from './Tasks/ParticleAnimator';
 import ParticleRecycler from './Tasks/ParticleRecycler';
+import ParticleReassigner from './Tasks/ParticleReassigner';
 import ParticleRebalancer from './Tasks/ParticleRebalancer';
 import StateStorage from '../StateStorage';
 import ParticleEntity from '../ParticleEntity';
@@ -14,6 +15,7 @@ export default class ParticleUseCase {
         private particleCleaner: ParticleCleaner,
         private particleAnimator: ParticleAnimator,
         private particleRecycler: ParticleRecycler,
+        private particleReassigner: ParticleReassigner,
         private particleRebalancer: ParticleRebalancer,
         private stateStorage: StateStorage
     ) {
@@ -30,18 +32,8 @@ export default class ParticleUseCase {
         this.particleCreator.createParticles(connections, particles);
         this.particleAnimator.updateParticles(connections, particles);
         this.particleRecycler.recycle(connections, particles);
+        this.particleReassigner.reassign(connections, particles);
         this.particleRebalancer.rebalance(connections, particles);
-
-        for (const p of particles) {
-            if (
-                p.source === undefined
-                || !connections[p.source]
-                || connections[p.source].value <= 0
-            ) {
-                p.source = undefined;
-                p.target = undefined;
-            }
-        }
 
         this.stateStorage.setParticles(
             this.particleCleaner.cleanParticles(connections, particles)

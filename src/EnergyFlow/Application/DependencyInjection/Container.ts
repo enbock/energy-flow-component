@@ -14,6 +14,7 @@ import ParticleAnimator from '../../Core/ParticleUseCase/Tasks/ParticleAnimator'
 import ConnectionFinder from '../../Core/ParticleUseCase/Tasks/ConnectionFinder';
 import TrajectoryCalculator from '../../Core/ParticleUseCase/Tasks/TrajectoryCalculator';
 import ParticleRecycler from '../../Core/ParticleUseCase/Tasks/ParticleRecycler';
+import ParticleReassigner from '../../Core/ParticleUseCase/Tasks/ParticleReassigner';
 import ParticleRebalancer from '../../Core/ParticleUseCase/Tasks/ParticleRebalancer';
 import EnergyFlowPresenter from '../View/EnergyFlowPresenter';
 
@@ -43,6 +44,10 @@ export default class Container {
                 this.config
             ),
             new ParticleRecycler(
+                connectionFinder,
+                trajectoryCalculator
+            ),
+            new ParticleReassigner(
                 connectionFinder,
                 trajectoryCalculator
             ),
