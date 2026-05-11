@@ -6,7 +6,9 @@
   "scripts": {
     "start": "webpack serve --open --mode development --no-open --no-hot --stats-error-details",
     "build": "webpack --mode production",
-    "test": "ts-node -r ./jasmine/globalSetup ./node_modules/jasmine/bin/jasmine.js --config=jasmine/jasmine.json"
+    "test:compile": "rimraf .testBuild && tsc -p tsconfig-tests.json",
+    "test:watch": "rimraf .testBuild && concurrently -k -n tsc,test \"tsc -p tsconfig-tests.json --watch\" \"node --import ./test/globalSetup.cjs --test --watch .testBuild/**/*.test.js\"",
+    "test": "npm run test:compile && node --import ./test/globalSetup.cjs --test .testBuild/src/**/*.test.js"
   },
   "repository": {
     "type": "git",
@@ -26,21 +28,15 @@
   },
   "homepage": "https://github.com/enbock/energy-flow-component#readme",
   "devDependencies": {
-    "@testing-library/dom": "*",
-    "@testing-library/jasmine-dom": "*",
-    "@testing-library/user-event": "*",
-    "@types/jasmine": "*",
     "@types/jsdom": "*",
     "@types/node": "*",
-    "@types/webpack": "*",
     "@types/webpack-env": "*",
+    "concurrently": "*",
     "copy-webpack-plugin": "*",
     "css-loader": "*",
-    "jasmine": "*",
     "jsdom": "*",
+    "rimraf": "*",
     "ts-loader": "*",
-    "ts-node": "*",
-    "tsconfig-paths": "*",
     "typescript": "*",
     "webpack": "*",
     "webpack-cli": "*",

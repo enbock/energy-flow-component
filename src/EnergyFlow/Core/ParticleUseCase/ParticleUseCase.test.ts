@@ -1,3 +1,6 @@
+import {describe, it, beforeEach} from 'node:test';
+import * as assert from 'node:assert';
+import {mock} from '../../../../test/mock';
 import ParticleUseCase from './ParticleUseCase';
 import ParticleCreator from './Tasks/ParticleCreator';
 import ParticleCleaner from './Tasks/ParticleCleaner';
@@ -6,27 +9,29 @@ import StateStorage from '../StateStorage';
 import GetParticlesResponse from './GetParticlesResponse';
 import ParticleEntity from '../ParticleEntity';
 import ConnectionEntity from '../ConnectionUseCase/ConnectionEntity';
+import ConnectionFinder from './Tasks/ConnectionFinder';
 
-describe('ParticleUseCase', function (): void {
-    let particleUseCase: ParticleUseCase,
-        particleCreator: Mocked<ParticleCreator>,
-        particleCleaner: Mocked<ParticleCleaner>,
-        particleAnimator: Mocked<ParticleAnimator>,
-        stateStorage: Mocked<StateStorage>
-    ;
+describe('EnergyFlow.Core.ParticleUseCase.ParticleUseCase', function (): void {
+    let particleUseCase: ParticleUseCase;
+    let particleCreator: Mocked<ParticleCreator>;
+    let particleCleaner: Mocked<ParticleCleaner>;
+    let particleAnimator: Mocked<ParticleAnimator>;
+    let stateStorage: Mocked<StateStorage>;
+    let connectionFinder: Mocked<ConnectionFinder>;
 
     beforeEach(function (): void {
         particleCreator = mock<ParticleCreator>();
         particleCleaner = mock<ParticleCleaner>();
         particleAnimator = mock<ParticleAnimator>();
         stateStorage = mock<StateStorage>();
+        connectionFinder = mock<ConnectionFinder>();
 
         particleUseCase = new ParticleUseCase(
             particleCreator,
             particleCleaner,
             particleAnimator,
             stateStorage,
-            mock()
+            connectionFinder
         );
     });
 
@@ -38,8 +43,8 @@ describe('ParticleUseCase', function (): void {
 
         await particleUseCase.getParticles(response);
 
-        expect(stateStorage.getParticles).toHaveBeenCalled();
-        expect(response.particles).toBe(particles);
+        assert.strictEqual(stateStorage.getParticles.mock.calls.length, 1);
+        assert.strictEqual(response.particles, particles);
     });
 
     it('should tick and update particles', function (): void {
@@ -52,9 +57,9 @@ describe('ParticleUseCase', function (): void {
 
         particleUseCase.tick();
 
-        expect(stateStorage.getParticles).toHaveBeenCalled();
-        expect(particleCreator.createParticles).toHaveBeenCalledWith(connections, particles);
-        expect(particleAnimator.updateParticles).toHaveBeenCalledWith(connections, particles);
-        expect(stateStorage.setParticles).toHaveBeenCalledWith(particles);
+        assert.strictEqual(stateStorage.getParticles.mock.calls.length, 1);
+        assert.deepStrictEqual(particleCreator.createParticles.mock.calls[0].arguments, [connections, particles]);
+        assert.deepStrictEqual(particleAnimator.updateParticles.mock.calls[0].arguments, [connections, particles]);
+        assert.deepStrictEqual(stateStorage.setParticles.mock.calls[0].arguments, [particles]);
     });
 });

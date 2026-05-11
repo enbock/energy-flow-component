@@ -1,16 +1,17 @@
+import {describe, it, beforeEach} from 'node:test';
+import * as assert from 'node:assert';
 import EnergyFlowPresenter from './EnergyFlowPresenter';
 import ResponseCollection from '../Controller/ResponseCollection';
 import ParticleEntity from '../../Core/ParticleEntity';
 import ConnectionEntity from '../../Core/ConnectionUseCase/ConnectionEntity';
 import EnergyFlowModel from './EnergyFlowModel';
 
-describe('EnergyFlowPresenter', function (): void {
-    let energyFlowPresenter: EnergyFlowPresenter,
-        data: ResponseCollection;
+describe('EnergyFlow.Application.View.EnergyFlowPresenter', function (): void {
+    let energyFlowPresenter: EnergyFlowPresenter;
+    let data: ResponseCollection;
 
     beforeEach(function (): void {
         energyFlowPresenter = new EnergyFlowPresenter();
-
         data = new ResponseCollection();
     });
 
@@ -35,13 +36,13 @@ describe('EnergyFlowPresenter', function (): void {
 
         const result: EnergyFlowModel = energyFlowPresenter.present(data);
 
-        expect(result.particles.length).toBe(2);
-        expect(result.particles[0].connectionIndex).toBe(5);
-        expect(result.particles[0].x).toBe(10);
-        expect(result.particles[0].y).toBe(20);
-        expect(result.particles[1].connectionIndex).toBe(3);
-        expect(result.particles[1].x).toBe(30);
-        expect(result.particles[1].y).toBe(40);
-        expect(result.colors).toEqual(['test::color1', 'test::color2']);
+        assert.strictEqual(result.particles.length, 2);
+        assert.strictEqual(result.particles[0].connectionIndex, 5);
+        assert.strictEqual(result.particles[0].x, 10);
+        assert.strictEqual(result.particles[0].y, 20);
+        assert.strictEqual(result.particles[1].connectionIndex, 3);
+        assert.strictEqual(result.particles[1].x, 30);
+        assert.strictEqual(result.particles[1].y, 40);
+        assert.deepStrictEqual(result.colors, ['test::color1', 'test::color2']);
     });
 });

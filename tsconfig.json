@@ -7,14 +7,14 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "module": "CommonJS",
+    "module": "nodenext",
     "target": "ESNext",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": false,
     "outDir": "./build/",
     "noImplicitAny": true,
-    "moduleResolution": "node",
+    "moduleResolution": "nodenext",
     "sourceRoot": "src",
     "sourceMap": true,
     "lib": [
@@ -23,26 +23,18 @@
       "ESNext"
     ],
     "types": [
-      "node",
-      "jasmine"
+      "node"
     ],
     "typeRoots": [
       "node_modules/@types",
-      "./src",
-      "./jasmine"
+      "./src"
     ]
   },
   "include": [
     "src",
-    "jasmine",
-    "webpack.config.ts"
+    "test/globals.d.ts"
   ],
   "exclude": [
     "node_modules"
-  ],
-  "ts-node": {
-    "require": [
-      "tsconfig-paths/register"
-    ]
-  }
+  ]
 }

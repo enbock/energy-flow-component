@@ -1,17 +1,19 @@
+import {describe, it, beforeEach, afterEach} from 'node:test';
+import * as assert from 'node:assert';
+import {createSpy} from '../../../../../test/mock';
 import ConnectionFinder from './ConnectionFinder';
 import ConnectionEntity from '../../ConnectionUseCase/ConnectionEntity';
-import createSpy = jasmine.createSpy;
 
-describe('ConnectionFinder', function (): void {
-    let connectionFinder: ConnectionFinder,
-        backupRandom: any;
+describe('EnergyFlow.Core.ParticleUseCase.Tasks.ConnectionFinder', function (): void {
+    let connectionFinder: ConnectionFinder;
+    let backupRandom: () => number;
 
     beforeEach(function (): void {
         connectionFinder = new ConnectionFinder();
 
         backupRandom = Math.random;
         Object.defineProperty(Math, 'random', {
-            value: createSpy(),
+            value: createSpy<() => number>(),
             writable: true,
             enumerable: true,
             configurable: true
@@ -26,15 +28,15 @@ describe('ConnectionFinder', function (): void {
         const connections: Array<ConnectionEntity> = [
             {value: -5},
             {value: -10}
-        ].map(data => {
-            const entity = new ConnectionEntity();
+        ].map(function (data: {value: number}): ConnectionEntity {
+            const entity: ConnectionEntity = new ConnectionEntity();
             entity.value = data.value;
             return entity;
         });
 
         const result: number | undefined = connectionFinder.chooseConnectionIndex(connections, true);
 
-        expect(result).toBeUndefined();
+        assert.strictEqual(result, undefined);
     });
 
     it('should return an index of a positive connection', function (): void {
@@ -42,16 +44,16 @@ describe('ConnectionFinder', function (): void {
             {value: 5},
             {value: -10},
             {value: 15}
-        ].map(data => {
-            const entity = new ConnectionEntity();
+        ].map(function (data: {value: number}): ConnectionEntity {
+            const entity: ConnectionEntity = new ConnectionEntity();
             entity.value = data.value;
             return entity;
         });
-        (<any>Math.random).and.returnValue(0.1);
+        (Math.random as unknown as MockFunction<() => number>).and.returnValue(0.1);
 
         const result: number | undefined = connectionFinder.chooseConnectionIndex(connections, true);
 
-        expect(result).toBe(0);
+        assert.strictEqual(result, 0);
     });
 
     it('should return an index of a negative connection', function (): void {
@@ -59,31 +61,31 @@ describe('ConnectionFinder', function (): void {
             {value: 5},
             {value: -10},
             {value: -15}
-        ].map(data => {
-            const entity = new ConnectionEntity();
+        ].map(function (data: {value: number}): ConnectionEntity {
+            const entity: ConnectionEntity = new ConnectionEntity();
             entity.value = data.value;
             return entity;
         });
 
-        (<any>Math.random).and.returnValue(0.9);
+        (Math.random as unknown as MockFunction<() => number>).and.returnValue(0.9);
 
         const result: number | undefined = connectionFinder.chooseConnectionIndex(connections, false);
 
-        expect(result).toBe(2);
+        assert.strictEqual(result, 2);
     });
 
     it('should handle edge case where all connections have zero value', function (): void {
         const connections: Array<ConnectionEntity> = [
             {value: 0},
             {value: 0}
-        ].map(data => {
-            const entity = new ConnectionEntity();
+        ].map(function (data: {value: number}): ConnectionEntity {
+            const entity: ConnectionEntity = new ConnectionEntity();
             entity.value = data.value;
             return entity;
         });
 
         const result: number | undefined = connectionFinder.chooseConnectionIndex(connections, true);
 
-        expect(result).toBeUndefined();
+        assert.strictEqual(result, undefined);
     });
 });

@@ -1,8 +1,7 @@
-import {Configuration} from 'webpack';
-import path from 'node:path';
-import CopyPlugin from 'copy-webpack-plugin';
+const path = require('node:path');
+const CopyPlugin = require('copy-webpack-plugin');
 
-const config: Configuration & { devServer: any } = {
+const config = {
     entry: './src/index.ts',
     output: {
         path: path.resolve(__dirname, 'build'),
@@ -63,10 +62,10 @@ const config: Configuration & { devServer: any } = {
     }
 };
 
-module.exports = (_: any, argv: any): Configuration => {
+module.exports = (_, argv) => {
     if (argv.mode === 'development') {
         config.devtool = 'inline-source-map';
-        config.plugins!.push(
+        config.plugins.push(
             new CopyPlugin({
                 patterns: [
                     {
@@ -76,7 +75,7 @@ module.exports = (_: any, argv: any): Configuration => {
             })
         );
     } else {
-        config.plugins!.push(
+        config.plugins.push(
             new CopyPlugin({
                 patterns: [
                     {

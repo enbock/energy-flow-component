@@ -1,12 +1,15 @@
+import {describe, it, beforeEach} from 'node:test';
+import * as assert from 'node:assert';
+import {mock} from '../../../../test/mock';
 import ConnectionUseCase from './ConnectionUseCase';
 import StateStorage from '../StateStorage';
 import UpdateConnectionsRequest from './UpdateConnectionsRequest';
 import ConnectionEntity from './ConnectionEntity';
 import GetConnectionResponse from './GetConnectionResponse';
 
-describe('ConnectionUseCase', function (): void {
-    let connectionUseCase: ConnectionUseCase,
-        stateStorage: Mocked<StateStorage>;
+describe('EnergyFlow.Core.ConnectionUseCase.ConnectionUseCase', function (): void {
+    let connectionUseCase: ConnectionUseCase;
+    let stateStorage: Mocked<StateStorage>;
 
     beforeEach(function (): void {
         stateStorage = mock<StateStorage>();
@@ -24,7 +27,7 @@ describe('ConnectionUseCase', function (): void {
 
         connectionUseCase.updateConnections(request);
 
-        expect(stateStorage.setConnections).toHaveBeenCalledWith(request.connections);
+        assert.deepStrictEqual(stateStorage.setConnections.mock.calls[0].arguments, [request.connections]);
     });
 
     it('should get connections and set them in the response', function (): void {
@@ -37,7 +40,7 @@ describe('ConnectionUseCase', function (): void {
 
         connectionUseCase.getConnections(response);
 
-        expect(stateStorage.getConnections).toHaveBeenCalled();
-        expect(response.connections).toBe(connections);
+        assert.strictEqual(stateStorage.getConnections.mock.calls.length, 1);
+        assert.strictEqual(response.connections, connections);
     });
 });

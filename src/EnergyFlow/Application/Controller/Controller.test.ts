@@ -1,6 +1,8 @@
+import {describe, it, beforeEach} from 'node:test';
+import * as assert from 'node:assert';
+import {mock} from '../../../../test/mock';
 import Controller from './Controller';
-import ControllerHandler from '../../../ControllerHandler';
-import {PresentDataCallback} from '../../../ControllerHandler';
+import ControllerHandler, {PresentDataCallback} from '../../../ControllerHandler';
 import EnergyFlowModel from '../View/EnergyFlowModel';
 import EnergyFlow from '../View/EnergyFlow';
 import ParticleUseCase from '../../Core/ParticleUseCase/ParticleUseCase';
@@ -10,14 +12,14 @@ import GetParticlesResponse from './GetParticlesResponse';
 import GetConnectionResponse from './GetConnectionResponse';
 import ResponseCollection from './ResponseCollection';
 
-describe('Controller', function (): void {
-    let controller: Controller,
-        mainView: Mocked<EnergyFlow>,
-        handler: Mocked<ControllerHandler>,
-        handlers: Array<Mocked<ControllerHandler>>,
-        particleUseCase: Mocked<ParticleUseCase>,
-        connectionUseCase: Mocked<ConnectionUseCase>,
-        energyFlowPresenter: Mocked<EnergyFlowPresenter>;
+describe('EnergyFlow.Application.Controller.Controller', function (): void {
+    let controller: Controller;
+    let mainView: Mocked<EnergyFlow>;
+    let handler: Mocked<ControllerHandler>;
+    let handlers: Array<Mocked<ControllerHandler>>;
+    let particleUseCase: Mocked<ParticleUseCase>;
+    let connectionUseCase: Mocked<ConnectionUseCase>;
+    let energyFlowPresenter: Mocked<EnergyFlowPresenter>;
 
     beforeEach(function (): void {
         mainView = mock<EnergyFlow>();
@@ -36,16 +38,16 @@ describe('Controller', function (): void {
         );
     });
 
-    it('should render the main view and initialize handlers', async function (): Promise<void> {
+    it('should render the main view and initialize handlers', function (): void {
         const energyFlowModel: EnergyFlowModel = new EnergyFlowModel();
 
         controller.initialize();
 
-        expect(mainView.render).toHaveBeenCalledWith(energyFlowModel);
-        expect(handler.initialize).toHaveBeenCalled();
+        assert.deepStrictEqual(mainView.render.mock.calls[0].arguments, [energyFlowModel]);
+        assert.strictEqual(handler.initialize.mock.calls.length, 1);
     });
 
-    it('should present data and render the main view', async function (): Promise<void> {
+    it('should present data and render the main view', function (): void {
         const particles: MockedObject = 'test::particle';
         const connections: MockedObject = 'test::connection';
 
@@ -66,9 +68,12 @@ describe('Controller', function (): void {
         expectedData.connectionResponse.connections = connections;
         expectedData.particleResponse.particles = particles;
 
-        expect(particleUseCase.getParticles).toHaveBeenCalledWith(expectedData.particleResponse);
-        expect(connectionUseCase.getConnections).toHaveBeenCalledWith(expectedData.connectionResponse);
-        expect(energyFlowPresenter.present).toHaveBeenCalledWith(expectedData);
-        expect(mainView.render).toHaveBeenCalledWith(<MockedObject>'test::presentedData');
+        assert.deepStrictEqual(particleUseCase.getParticles.mock.calls[0].arguments, [expectedData.particleResponse]);
+        assert.deepStrictEqual(
+            connectionUseCase.getConnections.mock.calls[0].arguments,
+            [expectedData.connectionResponse]
+        );
+        assert.deepStrictEqual(energyFlowPresenter.present.mock.calls[0].arguments, [expectedData]);
+        assert.deepStrictEqual(mainView.render.mock.calls[1].arguments, [<MockedObject>'test::presentedData']);
     });
 });
