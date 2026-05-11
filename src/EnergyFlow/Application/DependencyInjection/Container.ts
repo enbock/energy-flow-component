@@ -55,7 +55,8 @@ export default class Container {
                 connectionFinder,
                 trajectoryCalculator
             ),
-            stateStorage
+            stateStorage,
+            this.config
         );
         this.controller = new Controller(
             mainView,

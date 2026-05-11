@@ -7,4 +7,5 @@ export default class Config {
     public particleSpeed: number = 1;
     public particleCount: number = 600;
     public trajectorySteps: number = 48;
+    public recyclingEnabled: boolean = true;
 }

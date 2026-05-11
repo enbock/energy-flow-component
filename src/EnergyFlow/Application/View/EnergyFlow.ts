@@ -7,7 +7,7 @@ import Config from '../../Core/Config';
 
 export default class EnergyFlow extends HTMLElement {
     public static get observedAttributes(): Array<string> {
-        return ['debug-trajectories'];
+        return ['debug-trajectories', 'disable-recycling'];
     }
 
     public config: Config = new Config();
@@ -48,6 +48,9 @@ export default class EnergyFlow extends HTMLElement {
     public attributeChangedCallback(name: string): void {
         if (name === 'debug-trajectories') {
             requestAnimationFrame(() => this.renderView());
+        }
+        if (name === 'disable-recycling') {
+            this.config.recyclingEnabled = !this.hasAttribute('disable-recycling');
         }
     }
 

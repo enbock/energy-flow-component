@@ -12,6 +12,7 @@ import StateStorage from '../StateStorage';
 import GetParticlesResponse from './GetParticlesResponse';
 import ParticleEntity from '../ParticleEntity';
 import ConnectionEntity from '../ConnectionUseCase/ConnectionEntity';
+import Config from '../Config';
 
 describe('EnergyFlow.Core.ParticleUseCase.ParticleUseCase', function (): void {
     let particleUseCase: ParticleUseCase;
@@ -22,6 +23,7 @@ describe('EnergyFlow.Core.ParticleUseCase.ParticleUseCase', function (): void {
     let particleReassigner: Mocked<ParticleReassigner>;
     let particleRebalancer: Mocked<ParticleRebalancer>;
     let stateStorage: Mocked<StateStorage>;
+    let config: Config;
 
     beforeEach(function (): void {
         particleCreator = mock<ParticleCreator>();
@@ -31,6 +33,7 @@ describe('EnergyFlow.Core.ParticleUseCase.ParticleUseCase', function (): void {
         particleReassigner = mock<ParticleReassigner>();
         particleRebalancer = mock<ParticleRebalancer>();
         stateStorage = mock<StateStorage>();
+        config = new Config();
 
         particleUseCase = new ParticleUseCase(
             particleCreator,
@@ -39,7 +42,8 @@ describe('EnergyFlow.Core.ParticleUseCase.ParticleUseCase', function (): void {
             particleRecycler,
             particleReassigner,
             particleRebalancer,
-            stateStorage
+            stateStorage,
+            config
         );
     });
 
@@ -79,6 +83,26 @@ describe('EnergyFlow.Core.ParticleUseCase.ParticleUseCase', function (): void {
         assert.deepStrictEqual(particleReassigner.reassign.mock.calls[0].arguments, [connections, particles]);
         assert.deepStrictEqual(particleRebalancer.rebalance.mock.calls[0].arguments, [connections, particles]);
         assert.deepStrictEqual(stateStorage.setParticles.mock.calls[0].arguments, [particles]);
+    });
+
+    it('should skip recycling, reassigning and rebalancing when recycling is disabled', function (): void {
+        const particle: ParticleEntity = new ParticleEntity();
+        const particles: Array<ParticleEntity> = [particle];
+        const connections: Array<ConnectionEntity> = [];
+
+        config.recyclingEnabled = false;
+        stateStorage.getParticles.and.returnValue(particles);
+        stateStorage.getConnections.and.returnValue(connections);
+        particleCleaner.cleanParticles.and.returnValue(particles);
+
+        particleUseCase.tick();
+
+        assert.strictEqual(particleCreator.createParticles.mock.calls.length, 1);
+        assert.strictEqual(particleAnimator.updateParticles.mock.calls.length, 1);
+        assert.strictEqual(particleRecycler.recycle.mock.calls.length, 0);
+        assert.strictEqual(particleReassigner.reassign.mock.calls.length, 0);
+        assert.strictEqual(particleRebalancer.rebalance.mock.calls.length, 0);
+        assert.strictEqual(particleCleaner.cleanParticles.mock.calls.length, 1);
     });
 
     it('should not destroy particles directly when their source becomes invalid', function (): void {

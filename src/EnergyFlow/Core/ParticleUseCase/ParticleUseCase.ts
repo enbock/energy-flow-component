@@ -8,6 +8,7 @@ import StateStorage from '../StateStorage';
 import ParticleEntity from '../ParticleEntity';
 import GetParticlesResponse from './GetParticlesResponse';
 import ConnectionEntity from '../ConnectionUseCase/ConnectionEntity';
+import Config from '../Config';
 
 export default class ParticleUseCase {
     constructor(
@@ -17,7 +18,8 @@ export default class ParticleUseCase {
         private particleRecycler: ParticleRecycler,
         private particleReassigner: ParticleReassigner,
         private particleRebalancer: ParticleRebalancer,
-        private stateStorage: StateStorage
+        private stateStorage: StateStorage,
+        private config: Config
     ) {
     }
 
@@ -31,9 +33,12 @@ export default class ParticleUseCase {
 
         this.particleCreator.createParticles(connections, particles);
         this.particleAnimator.updateParticles(connections, particles);
-        this.particleRecycler.recycle(connections, particles);
-        this.particleReassigner.reassign(connections, particles);
-        this.particleRebalancer.rebalance(connections, particles);
+
+        if (this.config.recyclingEnabled) {
+            this.particleRecycler.recycle(connections, particles);
+            this.particleReassigner.reassign(connections, particles);
+            this.particleRebalancer.rebalance(connections, particles);
+        }
 
         this.stateStorage.setParticles(
             this.particleCleaner.cleanParticles(connections, particles)
