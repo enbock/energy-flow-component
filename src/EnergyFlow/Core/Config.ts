@@ -5,8 +5,7 @@ export default class Config {
     public canvasHeight: number = 0;
     public updateTimeout: number = 200;
     public particleSpeed: number = 1;
-    public particleCount: number = 1000;
-    public particleSpawnPerSource: number = 1;
+    public particleSpawnPerSource: number = 4;
     public maxPowerAt: number = 0;
     public trajectorySteps: number = 48;
 }

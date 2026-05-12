@@ -17,21 +17,18 @@ export default class ParticleCreator {
 
     public createParticles(connections: Array<ConnectionEntity>, particles: Array<ParticleEntity>): void {
         const scale: number = this.calculatePowerScale(connections);
-        const targetCount: number = Math.round(this.config.particleCount * scale);
-
-        if (targetCount <= particles.length) return;
         if (scale <= 0) return;
 
-        this.spawnAccumulator += scale;
-        if (this.spawnAccumulator < 1) return;
-        this.spawnAccumulator -= 1;
+        this.spawnAccumulator += this.config.particleSpawnPerSource * scale;
+        const spawnLimit: number = Math.floor(this.spawnAccumulator);
+        if (spawnLimit < 1) return;
+        this.spawnAccumulator -= spawnLimit;
 
-        const spawnLimit: number = this.config.particleSpawnPerSource;
         const spawnsPerSource: Map<number, number> = new Map();
         const maxAttempts: number = connections.length * spawnLimit + spawnLimit;
         let attempts: number = 0;
 
-        while (particles.length < targetCount && attempts < maxAttempts) {
+        while (attempts < maxAttempts) {
             attempts++;
             const sourceIndex: number | undefined = this.connectionFinder.chooseConnectionIndex(connections, true);
             if (sourceIndex === undefined) return;

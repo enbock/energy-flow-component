@@ -7,7 +7,7 @@ import Config from '../../Core/Config';
 
 export default class EnergyFlow extends HTMLElement {
     public static get observedAttributes(): Array<string> {
-        return ['debug-trajectories', 'max-at'];
+        return ['debug-trajectories', 'max-at', 'spawn-per-source'];
     }
 
     public config: Config = new Config();
@@ -51,6 +51,10 @@ export default class EnergyFlow extends HTMLElement {
         }
         if (name === 'max-at') {
             this.config.maxPowerAt = parseFloat(this.getAttribute('max-at') || '0') || 0;
+        }
+        if (name === 'spawn-per-source') {
+            const value: number = parseInt(this.getAttribute('spawn-per-source') || '0', 10);
+            if (value > 0) this.config.particleSpawnPerSource = value;
         }
     }
 

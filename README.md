@@ -82,10 +82,10 @@ The `<energy-flow>` element accepts a few optional attributes to control its beh
 
 `max-at` scales the rendered particle activity with the total positive power on the connections. The value is the power
 (in the same unit you feed into `<energy-connection value="…">`) at which the visualisation runs at full intensity —
-both the configured maximum particle count and the per-source spawn frequency are reached. Below that, the particle
-count is reduced proportionally and the spawn ticks are stretched out: at 50% of `max-at` particles spawn on average
-every second tick, at 25% every fourth, and so on. At zero power no particles spawn. When the attribute is omitted (or
-set to `0`) no scaling is applied and the component always runs at full intensity.
+the configured per-source spawn rate is reached. Below that, the spawn rate per tick is reduced proportionally: at 50%
+of `max-at` half as many particles spawn per tick (fractional rates are accumulated, so a rate of 0.5 produces one
+particle every other tick). At zero power no particles spawn. When the attribute is omitted (or set to `0`) no scaling
+is applied and the component always runs at full intensity.
 
 ```html
 <energy-flow max-at="20000">
@@ -95,6 +95,19 @@ set to `0`) no scaling is applied and the component always runs at full intensit
 ```
 
 You can update the value at any time; the new scale takes effect on the next tick.
+
+### `spawn-per-source`
+
+`spawn-per-source` overrides the configured number of particles that are emitted per source on each spawn tick. Higher
+values produce a denser stream; lower values thin it out. The value must be a positive integer; invalid or missing
+attributes leave the configured default in place.
+
+```html
+<energy-flow spawn-per-source="3">
+    <energy-connection value="12000" x="0" y="-.7"></energy-connection>
+    <energy-connection value="-12000" x="0" y=".8"></energy-connection>
+</energy-flow>
+```
 
 ### `debug-trajectories`
 
