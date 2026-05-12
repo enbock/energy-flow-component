@@ -9,5 +9,4 @@ export default class Config {
     public particleSpawnPerSource: number = 1;
     public maxPowerAt: number = 0;
     public trajectorySteps: number = 48;
-    public recyclingEnabled: boolean = true;
 }

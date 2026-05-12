@@ -95,7 +95,6 @@ Energy Flow Playground
 </energy-flow>
 || <label><input id="solar-off" type="checkbox">Solar off</label>
 || <label><input id="debug-trajectories" type="checkbox">Flugbahnen anzeigen</label>
-|| <label><input id="disable-recycling" type="checkbox">Recycling deaktivieren</label>
 
 <script>
     async function main() {
@@ -103,19 +102,11 @@ Energy Flow Playground
         const foreground = document.getElementById('foreground');
         const checkbox = document.getElementById('solar-off');
         const debugCheckbox = document.getElementById('debug-trajectories');
-        const recyclingCheckbox = document.getElementById('disable-recycling');
 
         debugCheckbox.addEventListener('change', function () {
             document.querySelectorAll('energy-flow').forEach(function (el) {
                 if (debugCheckbox.checked) el.setAttribute('debug-trajectories', '');
                 else el.removeAttribute('debug-trajectories');
-            });
-        });
-
-        recyclingCheckbox.addEventListener('change', function () {
-            document.querySelectorAll('energy-flow').forEach(function (el) {
-                if (recyclingCheckbox.checked) el.setAttribute('disable-recycling', '');
-                else el.removeAttribute('disable-recycling');
             });
         });
 

@@ -78,34 +78,6 @@ The component will calculate the position of the energy connection and set the `
 
 The `<energy-flow>` element accepts a few optional boolean attributes to control its behaviour at runtime.
 
-### `disable-recycling`
-
-By default, particles are continuously recycled, reassigned and rebalanced between sources whenever connection values
-change. Setting `disable-recycling` lets every particle finish its current trajectory to its target without being taken
-over mid-flight. When a particle arrives at its target it is removed and a new one is spawned at one of the currently
-positive sources.
-
-```html
-<energy-flow disable-recycling>
-    <energy-connection value="1000" x="0" y="-.8"></energy-connection>
-    <energy-connection value="-1000" x="0" y=".8"></energy-connection>
-</energy-flow>
-```
-
-You can toggle the attribute at any time, for example via a checkbox:
-
-```html
-<label><input id="recycling-toggle" type="checkbox">Disable recycling</label>
-<script>
-    document.getElementById('recycling-toggle').addEventListener('change', function (event) {
-        document.querySelectorAll('energy-flow').forEach(function (element) {
-            if (event.target.checked) element.setAttribute('disable-recycling', '');
-            else element.removeAttribute('disable-recycling');
-        });
-    });
-</script>
-```
-
 ### `debug-trajectories`
 
 Setting `debug-trajectories` renders every particle's precomputed flight path on the canvas in the particle's source
