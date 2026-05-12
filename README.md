@@ -13,7 +13,7 @@ a "medium" instead visualize cables or arrows.
 
 Of course, I don't have fun to write down all the code. So the first POC I let create by OpenAI GPT o1 ;)
 
-Over the time I used Clause Sonnet and Opus via Copilot CLI to write test, update environment and code my ideas down.
+Over the time I used Claude Sonnet and Opus via Copilot CLI to write test, update environment and code my ideas down.
 
 ## Usage of component
 
