@@ -6,6 +6,8 @@ import ConnectionFinder from './ConnectionFinder';
 import TrajectoryCalculator from './TrajectoryCalculator';
 
 export default class ParticleCreator {
+    private spawnAccumulator: number = 0;
+
     constructor(
         private config: Config,
         private connectionFinder: ConnectionFinder,
@@ -14,12 +16,22 @@ export default class ParticleCreator {
     }
 
     public createParticles(connections: Array<ConnectionEntity>, particles: Array<ParticleEntity>): void {
-        const spawnsPerSource: Map<number, number> = new Map();
+        const scale: number = this.calculatePowerScale(connections);
+        const targetCount: number = Math.round(this.config.particleCount * scale);
+
+        if (targetCount <= particles.length) return;
+        if (scale <= 0) return;
+
+        this.spawnAccumulator += scale;
+        if (this.spawnAccumulator < 1) return;
+        this.spawnAccumulator -= 1;
+
         const spawnLimit: number = this.config.particleSpawnPerSource;
+        const spawnsPerSource: Map<number, number> = new Map();
         const maxAttempts: number = connections.length * spawnLimit + spawnLimit;
         let attempts: number = 0;
 
-        while (particles.length < this.config.particleCount && attempts < maxAttempts) {
+        while (particles.length < targetCount && attempts < maxAttempts) {
             attempts++;
             const sourceIndex: number | undefined = this.connectionFinder.chooseConnectionIndex(connections, true);
             if (sourceIndex === undefined) return;
@@ -32,6 +44,17 @@ export default class ParticleCreator {
             particles.push(newParticle);
             this.resetParticle(newParticle, connections, connections[sourceIndex], sourceIndex);
         }
+    }
+
+    private calculatePowerScale(connections: Array<ConnectionEntity>): number {
+        if (this.config.maxPowerAt <= 0) return 1;
+
+        let positivePower: number = 0;
+        for (const connection of connections) {
+            if (connection.value > 0) positivePower += connection.value;
+        }
+
+        return Math.min(positivePower / this.config.maxPowerAt, 1);
     }
 
     private resetParticle(

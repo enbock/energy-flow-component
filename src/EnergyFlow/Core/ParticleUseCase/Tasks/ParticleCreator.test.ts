@@ -142,4 +142,144 @@ describe('EnergyFlow.Core.ParticleUseCase.Tasks.ParticleCreator', function (): v
 
         assert.strictEqual(particles.length, 0);
     });
+
+    it('should scale particle count proportionally to the positive power against maxPowerAt', function (): void {
+        config.particleCount = 100;
+        config.particleSpawnPerSource = 100;
+        config.maxPowerAt = 20000;
+        const sourceA: ConnectionEntity = new ConnectionEntity();
+        sourceA.value = 4000;
+        sourceA.x = -1;
+        sourceA.y = 0;
+        const sourceB: ConnectionEntity = new ConnectionEntity();
+        sourceB.value = 1000;
+        sourceB.x = 0;
+        sourceB.y = 1;
+        const target: ConnectionEntity = new ConnectionEntity();
+        target.value = -5000;
+        target.x = 1;
+        target.y = 0;
+        const connections: Array<ConnectionEntity> = [sourceA, sourceB, target];
+        const particles: Array<ParticleEntity> = [];
+        const trajectory: Array<{x: number, y: number}> = [{x: -1, y: 0}, {x: 1, y: 0}];
+        connectionFinder.chooseConnectionIndex.and.callFake(function (_: Array<ConnectionEntity>, positive: boolean): number {
+            return positive === false ? 2 : 0;
+        });
+        trajectoryCalculator.calculateTrajectory.and.returnValue(trajectory);
+        trajectoryCalculator.calculateLength.and.returnValue(2);
+
+        particleCreator.createParticles(connections, particles);
+        particleCreator.createParticles(connections, particles);
+        particleCreator.createParticles(connections, particles);
+        particleCreator.createParticles(connections, particles);
+
+        assert.strictEqual(particles.length, 25);
+    });
+
+    it('should cap particle count at the configured maximum when power exceeds maxPowerAt', function (): void {
+        config.particleCount = 10;
+        config.particleSpawnPerSource = 100;
+        config.maxPowerAt = 1000;
+        const source: ConnectionEntity = new ConnectionEntity();
+        source.value = 50000;
+        source.x = -1;
+        source.y = 0;
+        const target: ConnectionEntity = new ConnectionEntity();
+        target.value = -50000;
+        target.x = 1;
+        target.y = 0;
+        const connections: Array<ConnectionEntity> = [source, target];
+        const particles: Array<ParticleEntity> = [];
+        const trajectory: Array<{x: number, y: number}> = [{x: -1, y: 0}, {x: 1, y: 0}];
+        connectionFinder.chooseConnectionIndex.and.callFake(function (_: Array<ConnectionEntity>, positive: boolean): number {
+            return positive === false ? 1 : 0;
+        });
+        trajectoryCalculator.calculateTrajectory.and.returnValue(trajectory);
+        trajectoryCalculator.calculateLength.and.returnValue(2);
+
+        particleCreator.createParticles(connections, particles);
+
+        assert.strictEqual(particles.length, 10);
+    });
+
+    it('should scale the spawn frequency proportionally to the positive power', function (): void {
+        config.particleCount = 100;
+        config.particleSpawnPerSource = 1;
+        config.maxPowerAt = 20000;
+        const source: ConnectionEntity = new ConnectionEntity();
+        source.value = 5000;
+        source.x = -1;
+        source.y = 0;
+        const target: ConnectionEntity = new ConnectionEntity();
+        target.value = -5000;
+        target.x = 1;
+        target.y = 0;
+        const connections: Array<ConnectionEntity> = [source, target];
+        const particles: Array<ParticleEntity> = [];
+        const trajectory: Array<{x: number, y: number}> = [{x: -1, y: 0}, {x: 1, y: 0}];
+        connectionFinder.chooseConnectionIndex.and.callFake(function (_: Array<ConnectionEntity>, positive: boolean): number {
+            return positive === false ? 1 : 0;
+        });
+        trajectoryCalculator.calculateTrajectory.and.returnValue(trajectory);
+        trajectoryCalculator.calculateLength.and.returnValue(2);
+
+        particleCreator.createParticles(connections, particles);
+        particleCreator.createParticles(connections, particles);
+        particleCreator.createParticles(connections, particles);
+        particleCreator.createParticles(connections, particles);
+
+        assert.strictEqual(particles.length, 1);
+    });
+
+    it('should spawn the full per-source rate on every tick when power matches maxPowerAt', function (): void {
+        config.particleCount = 100;
+        config.particleSpawnPerSource = 2;
+        config.maxPowerAt = 10000;
+        const source: ConnectionEntity = new ConnectionEntity();
+        source.value = 10000;
+        source.x = -1;
+        source.y = 0;
+        const target: ConnectionEntity = new ConnectionEntity();
+        target.value = -10000;
+        target.x = 1;
+        target.y = 0;
+        const connections: Array<ConnectionEntity> = [source, target];
+        const particles: Array<ParticleEntity> = [];
+        const trajectory: Array<{x: number, y: number}> = [{x: -1, y: 0}, {x: 1, y: 0}];
+        connectionFinder.chooseConnectionIndex.and.callFake(function (_: Array<ConnectionEntity>, positive: boolean): number {
+            return positive === false ? 1 : 0;
+        });
+        trajectoryCalculator.calculateTrajectory.and.returnValue(trajectory);
+        trajectoryCalculator.calculateLength.and.returnValue(2);
+
+        particleCreator.createParticles(connections, particles);
+
+        assert.strictEqual(particles.length, 2);
+    });
+
+    it('should skip spawning entirely on most ticks when power is far below maxPowerAt', function (): void {
+        config.particleCount = 100;
+        config.particleSpawnPerSource = 2;
+        config.maxPowerAt = 20000;
+        const source: ConnectionEntity = new ConnectionEntity();
+        source.value = 1000;
+        source.x = -1;
+        source.y = 0;
+        const target: ConnectionEntity = new ConnectionEntity();
+        target.value = -1000;
+        target.x = 1;
+        target.y = 0;
+        const connections: Array<ConnectionEntity> = [source, target];
+        const particles: Array<ParticleEntity> = [];
+        const trajectory: Array<{x: number, y: number}> = [{x: -1, y: 0}, {x: 1, y: 0}];
+        connectionFinder.chooseConnectionIndex.and.callFake(function (_: Array<ConnectionEntity>, positive: boolean): number {
+            return positive === false ? 1 : 0;
+        });
+        trajectoryCalculator.calculateTrajectory.and.returnValue(trajectory);
+        trajectoryCalculator.calculateLength.and.returnValue(2);
+
+        particleCreator.createParticles(connections, particles);
+
+        assert.strictEqual(particles.length, 0);
+    });
 });

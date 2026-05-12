@@ -1,6 +1,6 @@
 {
   "name": "@enbock/energy-flow-component",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "A visualisation of a energy flow.",
   "main": "index.js",
   "publishConfig": {

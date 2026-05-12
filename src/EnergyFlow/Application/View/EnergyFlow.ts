@@ -7,7 +7,7 @@ import Config from '../../Core/Config';
 
 export default class EnergyFlow extends HTMLElement {
     public static get observedAttributes(): Array<string> {
-        return ['debug-trajectories', 'disable-recycling'];
+        return ['debug-trajectories', 'disable-recycling', 'max-at'];
     }
 
     public config: Config = new Config();
@@ -51,6 +51,9 @@ export default class EnergyFlow extends HTMLElement {
         }
         if (name === 'disable-recycling') {
             this.config.recyclingEnabled = !this.hasAttribute('disable-recycling');
+        }
+        if (name === 'max-at') {
+            this.config.maxPowerAt = parseFloat(this.getAttribute('max-at') || '0') || 0;
         }
     }
 
