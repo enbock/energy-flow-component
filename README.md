@@ -76,7 +76,25 @@ The component will calculate the position of the energy connection and set the `
 
 ## Optional attributes
 
-The `<energy-flow>` element accepts a few optional boolean attributes to control its behaviour at runtime.
+The `<energy-flow>` element accepts a few optional attributes to control its behaviour at runtime.
+
+### `max-at`
+
+`max-at` scales the rendered particle activity with the total positive power on the connections. The value is the power
+(in the same unit you feed into `<energy-connection value="…">`) at which the visualisation runs at full intensity —
+both the configured maximum particle count and the per-source spawn frequency are reached. Below that, the particle
+count is reduced proportionally and the spawn ticks are stretched out: at 50% of `max-at` particles spawn on average
+every second tick, at 25% every fourth, and so on. At zero power no particles spawn. When the attribute is omitted (or
+set to `0`) no scaling is applied and the component always runs at full intensity.
+
+```html
+<energy-flow max-at="20000">
+    <energy-connection value="12000" x="0" y="-.7"></energy-connection>
+    <energy-connection value="-12000" x="0" y=".8"></energy-connection>
+</energy-flow>
+```
+
+You can update the value at any time; the new scale takes effect on the next tick.
 
 ### `debug-trajectories`
 
