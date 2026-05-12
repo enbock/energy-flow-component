@@ -86,28 +86,34 @@ describe('EnergyFlow.Core.ParticleUseCase.Tasks.ParticleCreator', function (): v
             const particles: Array<ParticleEntity> = [];
             particleCreator.createParticles(connections, particles);
 
-            assert.strictEqual(particles[0].trajectoryProgress, 0.5);
-            assert.deepStrictEqual(particles[0].position, {x: 0, y: 0});
+            assert.strictEqual(particles[0].trajectoryProgress, 0.05);
+            assert.deepStrictEqual(particles[0].position, {x: -0.9, y: 0});
         } finally {
             Math.random = backupRandom;
         }
     });
 
-    it('should immediately fill particles up to the configured maximum on first call', function (): void {
-        config.particleCount = 5;
-        const source: ConnectionEntity = new ConnectionEntity();
-        source.value = 5;
-        source.x = -1;
-        source.y = 0;
+    it('should respect the per-source spawn limit per call', function (): void {
+        config.particleCount = 10;
+        config.particleSpawnPerSource = 2;
+        const sourceA: ConnectionEntity = new ConnectionEntity();
+        sourceA.value = 5;
+        sourceA.x = -1;
+        sourceA.y = 0;
+        const sourceB: ConnectionEntity = new ConnectionEntity();
+        sourceB.value = 5;
+        sourceB.x = 0;
+        sourceB.y = 1;
         const target: ConnectionEntity = new ConnectionEntity();
         target.value = -5;
         target.x = 1;
         target.y = 0;
-        const connections: Array<ConnectionEntity> = [source, target];
+        const connections: Array<ConnectionEntity> = [sourceA, sourceB, target];
         const particles: Array<ParticleEntity> = [];
         const trajectory: Array<{x: number, y: number}> = [{x: -1, y: 0}, {x: 1, y: 0}];
         let chooseCall: number = 0;
-        connectionFinder.chooseConnectionIndex.and.callFake(function (): number {
+        connectionFinder.chooseConnectionIndex.and.callFake(function (_: Array<ConnectionEntity>, positive: boolean): number {
+            if (positive === false) return 2;
             return chooseCall++ % 2 === 0 ? 0 : 1;
         });
         trajectoryCalculator.calculateTrajectory.and.returnValue(trajectory);
@@ -115,7 +121,15 @@ describe('EnergyFlow.Core.ParticleUseCase.Tasks.ParticleCreator', function (): v
 
         particleCreator.createParticles(connections, particles);
 
-        assert.strictEqual(particles.length, 5);
+        assert.strictEqual(particles.length, 4);
+        const fromSourceA: number = particles.filter(function (p: ParticleEntity): boolean {
+            return p.source === 0;
+        }).length;
+        const fromSourceB: number = particles.filter(function (p: ParticleEntity): boolean {
+            return p.source === 1;
+        }).length;
+        assert.strictEqual(fromSourceA, 2);
+        assert.strictEqual(fromSourceB, 2);
     });
 
     it('should not create particles when no positive source is available', function (): void {

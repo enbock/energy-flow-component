@@ -14,9 +14,19 @@ export default class ParticleCreator {
     }
 
     public createParticles(connections: Array<ConnectionEntity>, particles: Array<ParticleEntity>): void {
-        while (particles.length < this.config.particleCount) {
+        const spawnsPerSource: Map<number, number> = new Map();
+        const spawnLimit: number = this.config.particleSpawnPerSource;
+        const maxAttempts: number = connections.length * spawnLimit + spawnLimit;
+        let attempts: number = 0;
+
+        while (particles.length < this.config.particleCount && attempts < maxAttempts) {
+            attempts++;
             const sourceIndex: number | undefined = this.connectionFinder.chooseConnectionIndex(connections, true);
             if (sourceIndex === undefined) return;
+
+            const currentSpawns: number = spawnsPerSource.get(sourceIndex) ?? 0;
+            if (currentSpawns >= spawnLimit) continue;
+            spawnsPerSource.set(sourceIndex, currentSpawns + 1);
 
             const newParticle: ParticleEntity = new ParticleEntity();
             particles.push(newParticle);
@@ -48,7 +58,7 @@ export default class ParticleCreator {
             {x: targetConnection.x, y: targetConnection.y}
         );
         particle.trajectoryLength = this.trajectoryCalculator.calculateLength(particle.trajectory);
-        particle.trajectoryProgress = Math.random();
+        particle.trajectoryProgress = Math.random() * 0.1;
         particle.position = this.calculatePositionAt(particle.trajectory, particle.trajectoryProgress);
     }
 

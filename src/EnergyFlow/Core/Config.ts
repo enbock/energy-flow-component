@@ -6,6 +6,7 @@ export default class Config {
     public updateTimeout: number = 200;
     public particleSpeed: number = 1;
     public particleCount: number = 600;
+    public particleSpawnPerSource: number = 2;
     public trajectorySteps: number = 48;
     public recyclingEnabled: boolean = true;
 }

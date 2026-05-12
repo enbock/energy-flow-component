@@ -20,6 +20,5 @@ export default class AnimationHandler implements ControllerHandler {
         this.particleUseCase.tick();
         this.presentData();
         requestAnimationFrame(this.updateSimulation.bind(this));
-        // setTimeout(this.updateSimulation.bind(this), 500);
     }
 }
